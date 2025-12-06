@@ -1,0 +1,6 @@
+main: 	main.c memMgt.o
+	gcc -g main.c memMgt.o -o main
+
+memMgt.o: memMgt.c memMgt.h
+	gcc -g -c memMgt.c -o memMgt.o
+
