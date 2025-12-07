@@ -18,44 +18,39 @@ struct matrixType *subtractMatrix(struct matrixType *A, struct matrixType *B);
 struct matrixType *scalarAddMatrix(struct matrixType *A, double _scalar);
 struct matrixType *scalarMultMatrix(struct matrixType *A, double _scalar);
 struct matrixType *transpose(struct matrixType *A);
-
+struct matrixType *multiMatrix(struct matrixType *A, struct matrixType *B);
+struct matrixType *ident(int _size, double _scalar);
 //===================================
+// Need to do Gauss/Jordan to calculate the inverse
+struct matrixType *ident(int _size, double _scalar) {
+    struct matrixType *A;
 
-
-
-
-struct matrixType *multiMatrix(struct matrixType *A, struct matrixType *B) {
-    
-    // Make sure the the two matrices are compatable (i.e., A->Ncols == B->Nrows)
-    if(A->Ncols != B->Nrows) {
-        printf("ERROR: multiMatrix(): Mismatched matrix dimensions: A->Ncols: %d, B->Nrows: %d\n", A->Ncols, B->Nrows);
-        return NULL;
-    } else {
-        printf("GOOD!! addMatrix(): Matched matrix dimensions: A->Ncols: %d, B->Nrows: %d\n", A->Ncols, B->Nrows);
-    }
-
-    //struct matrixType *Bt;
-    //Bt = transpose(B);
-    //showMatrix(Bt, "Bt: Used in multiMatrix");
-    
-    struct matrixType *C;
-    C = newMatrix(A->Nrows, B->Ncols);
-    if (C == NULL) {
-        return NULL;
-    }
-
-    // Let's do a little dot product... of sorts. (Note: I should write a dot product function.
-    for(int c = 0; c < B->Ncols; c++) {
-        for(int r = 0; r < A->Nrows; r++) {
-            C->matrix[r][c] = 0.0;
-            for(int i = 0; i < A->Ncols; i++) {
-                C->matrix[r][c] = C->matrix[r][c] + B->matrix[i][c] * A->matrix[r][i]; 
-            }
+    A = newMatrix(_size, _size);
+    if (A != NULL) {
+        
+        for(int i = 0; i < _size; i++) {
+            A->matrix[i][i] = _scalar;
         }
     }
-    
-    return C;
+
+    return A;
 }
+
+// NEED to test these new functions!!!!!
+
+
+void update(struct matrixType *A, int r, int c, double v) {
+    if (A == NULL ||
+        r < 0 || r >= A->Nrows ||
+        c < 0 ||c >= A->Ncols) {
+        return;
+    }
+
+    A->matrix[r][c] = v;
+    
+    return;
+}
+
 
 
 //===================================
@@ -299,3 +294,32 @@ struct matrixType *transpose(struct matrixType *A) {
     return C;
 }
 
+
+struct matrixType *multiMatrix(struct matrixType *A, struct matrixType *B) {
+    
+    // Make sure the the two matrices are compatable (i.e., A->Ncols == B->Nrows)
+    if(A->Ncols != B->Nrows) {
+        printf("ERROR: multiMatrix(): Mismatched matrix dimensions: A->Ncols: %d, B->Nrows: %d\n", A->Ncols, B->Nrows);
+        return NULL;
+    } else {
+        printf("GOOD!! addMatrix(): Matched matrix dimensions: A->Ncols: %d, B->Nrows: %d\n", A->Ncols, B->Nrows);
+    }
+    
+    struct matrixType *C;
+    C = newMatrix(A->Nrows, B->Ncols);
+    if (C == NULL) {
+        return NULL;
+    }
+
+    // Let's do a little dot product... of sorts. (Note: I should write a dot product function?)
+    for(int c = 0; c < B->Ncols; c++) {
+        for(int r = 0; r < A->Nrows; r++) {
+            C->matrix[r][c] = 0.0;
+            for(int i = 0; i < A->Ncols; i++) {
+                C->matrix[r][c] = C->matrix[r][c] + B->matrix[i][c] * A->matrix[r][i]; // Dot product!!
+            }
+        }
+    }
+    
+    return C;
+}
