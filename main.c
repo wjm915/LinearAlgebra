@@ -20,37 +20,106 @@ struct matrixType *scalarMultMatrix(struct matrixType *A, double _scalar);
 struct matrixType *transpose(struct matrixType *A);
 struct matrixType *multiMatrix(struct matrixType *A, struct matrixType *B);
 struct matrixType *ident(int _size, double _scalar);
+void update(struct matrixType *A, int r, int c, double v);
 //===================================
 // Need to do Gauss/Jordan to calculate the inverse
-struct matrixType *ident(int _size, double _scalar) {
-    struct matrixType *A;
 
-    A = newMatrix(_size, _size);
-    if (A != NULL) {
-        
-        for(int i = 0; i < _size; i++) {
-            A->matrix[i][i] = _scalar;
+struct matrixType *invert(struct matrixType *A) {
+    if (A == NULL) {
+        printf("ERROR: invert(): NULL input matrix.\n");
+        return NULL;
+    }
+
+    if (A->Nrows != A->Ncols) {
+        printf("ERROR: invert(): Nonsquare input matrics.\n");
+        return NULL;
+    }
+
+    // This function will use Gauss-Jordan based process to calculate
+    // the matrix's inverse.
+
+    double dtemp;
+
+    struct matrixType *M;
+    M = newMatrix(A->Nrows, (A->Ncols*2));
+    if (M == NULL) {
+        return NULL;
+    }
+
+    // Copy A to M
+    for(int r = 0; r < A->Nrows; r++) {
+        for(int c = 0; c < A->Ncols; c++) {
+            M->matrix[r][c] = A->matrix[r][c];
         }
     }
 
-    return A;
-}
-
-// NEED to test these new functions!!!!!
-
-
-void update(struct matrixType *A, int r, int c, double v) {
-    if (A == NULL ||
-        r < 0 || r >= A->Nrows ||
-        c < 0 ||c >= A->Ncols) {
-        return;
+    // Add the identity matrix to the augmented M matrix
+    for(int r = 0; r < A->Nrows; r++) {
+        M->matrix[r][(A->Nrows+r)] = 1.0;
     }
-
-    A->matrix[r][c] = v;
     
-    return;
-}
+    showMatrix(M, "1. Augmented Matrix");
 
+    //================ Gauss
+    // Gauss: Go down the diagonal: Create lower echelon form
+    for(int diag = 0; diag < M->Nrows; ++diag) {
+        // Create '1' in the pivot (aka diagonal).
+        printf("Pivot: [%d][%d]\n", diag, diag);
+        dtemp = M->matrix[diag][diag];
+        for(int c = diag; c < M->Ncols; c++) {
+            M->matrix[diag][c] = M->matrix[diag][c]/dtemp;
+        }
+        showMatrix(M, "2. Augmented Matrix: '1' at the Pivot");
+
+        // Zero below the pivot
+        for(int r = (diag + 1); r < M->Nrows; r++) {
+            dtemp = M->matrix[r][diag];
+            for(int c = diag; c < M->Ncols; c++) {
+                printf("diag: %d, r: %d, c: %d, ", diag, r, c); 
+                printf("M->matrix[r][c]: %f, ", M->matrix[r][c]);
+                printf("dtemp: %f, ", dtemp);
+                printf("M->matrix[diag][c]: %f, ", M->matrix[diag][c]);
+                
+                M->matrix[r][c] = M->matrix[r][c] - (dtemp * M->matrix[diag][c]); 
+                printf(" FinalValue: %f\n", M->matrix[r][c]);
+            }
+            printf("\n");
+
+        }
+        showMatrix(M, "3. Augmented Matrix:");            
+    }
+    
+    //================ Jordan
+    // Jordan: Go down the diagonal: Create lower echelon form
+    for(int diag = 0; diag < M->Nrows; ++diag) {
+        // Create '1' in the pivot (aka diagonal).
+        printf("Pivot: [%d][%d]\n", diag, diag);
+        dtemp = M->matrix[diag][diag];
+        for(int c = diag; c < M->Ncols; c++) {
+            M->matrix[diag][c] = M->matrix[diag][c]/dtemp;
+        }
+        showMatrix(M, "2. Augmented Matrix: '1' at the Pivot");
+
+        // Zero below the pivot
+        for(int r = (diag + 1); r < M->Nrows; r++) {
+            dtemp = M->matrix[r][diag];
+            for(int c = diag; c < M->Ncols; c++) {
+                printf("diag: %d, r: %d, c: %d, ", diag, r, c); 
+                printf("M->matrix[r][c]: %f, ", M->matrix[r][c]);
+                printf("dtemp: %f, ", dtemp);
+                printf("M->matrix[diag][c]: %f, ", M->matrix[diag][c]);
+                
+                M->matrix[r][c] = M->matrix[r][c] - (dtemp * M->matrix[diag][c]); 
+                printf(" FinalValue: %f\n", M->matrix[r][c]);
+            }
+            printf("\n");
+
+        }
+        showMatrix(M, "3. Augmented Matrix:");            
+    }
+    
+    return M;
+}
 
 
 //===================================
@@ -61,7 +130,14 @@ int main() {
     struct matrixType *A;
     struct matrixType *B;
     struct matrixType *C;
+    
 
+    A = ident(3, 3);
+    initMatrix(A, (double []){1.1, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0}, 9);
+    B = invert(A);
+    showMatrix(B, "Matrix A: Inverse matrix");
+
+    /*
     A = newMatrix(2,2);
     initMatrix(A, (double []){1.0, 2.0, 3.0, 4.0}, 4);
     showMatrix(A, "Matrix A: Source matrix");
@@ -72,6 +148,7 @@ int main() {
 
     C = multiMatrix(A, B);
     showMatrix(C, "Matrix C: multiMatrix matrix");
+    */
     
     /*
     struct matrixType *A;
@@ -323,3 +400,34 @@ struct matrixType *multiMatrix(struct matrixType *A, struct matrixType *B) {
     
     return C;
 }
+
+struct matrixType *ident(int _size, double _scalar) {
+    struct matrixType *A;
+
+    A = newMatrix(_size, _size);
+    if (A != NULL) {
+        
+        for(int i = 0; i < _size; i++) {
+            A->matrix[i][i] = _scalar;
+        }
+    }
+
+    return A;
+}
+
+
+void update(struct matrixType *A, int r, int c, double v) {
+    if (A == NULL ||
+        r < 0 || r >= A->Nrows ||
+        c < 0 ||c >= A->Ncols) {
+        return;
+    }
+
+    A->matrix[r][c] = v;
+    
+    return;
+}
+
+
+
+//==========
