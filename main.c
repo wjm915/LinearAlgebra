@@ -64,44 +64,37 @@ struct matrixType *invert(struct matrixType *A) {
     // Gauss: Go down the diagonal: Create lower echelon form
     for(int diag = 0; diag < M->Nrows; ++diag) {
         // Create '1' in the pivot (aka diagonal).
-        printf("Pivot: [%d][%d]\n", diag, diag);
+        //printf("Pivot: [%d][%d]\n", diag, diag);
         dtemp = M->matrix[diag][diag];
         for(int c = diag; c < M->Ncols; c++) {
             M->matrix[diag][c] = M->matrix[diag][c]/dtemp;
         }
-        showMatrix(M, "2. Augmented Matrix: '1' at the Pivot");
+        //showMatrix(M, "2. Augmented Matrix: '1' at the Pivot");
 
         // Zero below the pivot
         for(int r = (diag + 1); r < M->Nrows; r++) {
             dtemp = M->matrix[r][diag];
             for(int c = diag; c < M->Ncols; c++) {
-                printf("diag: %d, r: %d, c: %d, ", diag, r, c); 
-                printf("M->matrix[r][c]: %f, ", M->matrix[r][c]);
-                printf("dtemp: %f, ", dtemp);
-                printf("M->matrix[diag][c]: %f, ", M->matrix[diag][c]);
+                //printf("diag: %d, r: %d, c: %d, ", diag, r, c); 
+                //printf("M->matrix[r][c]: %f, ", M->matrix[r][c]);
+                //printf("dtemp: %f, ", dtemp);
+                //printf("M->matrix[diag][c]: %f, ", M->matrix[diag][c]);
                 
                 M->matrix[r][c] = M->matrix[r][c] - (dtemp * M->matrix[diag][c]); 
-                printf(" FinalValue: %f\n", M->matrix[r][c]);
+                //printf(" FinalValue: %f\n", M->matrix[r][c]);
             }
-            printf("\n");
+            //printf("\n");
 
         }
         showMatrix(M, "3. Augmented Matrix:");            
     }
     
     //================ Jordan
-    // Jordan: Go down the diagonal: Create lower echelon form
-    for(int diag = 0; diag < M->Nrows; ++diag) {
-        // Create '1' in the pivot (aka diagonal).
-        printf("Pivot: [%d][%d]\n", diag, diag);
-        dtemp = M->matrix[diag][diag];
-        for(int c = diag; c < M->Ncols; c++) {
-            M->matrix[diag][c] = M->matrix[diag][c]/dtemp;
-        }
-        showMatrix(M, "2. Augmented Matrix: '1' at the Pivot");
+    // Jordan: Go up the diagonal:
+    for(int diag = (M->Nrows -1); diag > 0; --diag) {
 
         // Zero below the pivot
-        for(int r = (diag + 1); r < M->Nrows; r++) {
+        for(int r = (diag - 1); r >= 0; r--) {
             dtemp = M->matrix[r][diag];
             for(int c = diag; c < M->Ncols; c++) {
                 printf("diag: %d, r: %d, c: %d, ", diag, r, c); 
@@ -115,7 +108,7 @@ struct matrixType *invert(struct matrixType *A) {
             printf("\n");
 
         }
-        showMatrix(M, "3. Augmented Matrix:");            
+        showMatrix(M, "4. Augmented Matrix:");            
     }
     
     return M;
