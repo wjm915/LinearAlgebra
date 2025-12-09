@@ -3,7 +3,7 @@
 #include <math.h>
 #include "/home/billy/code.d/c.d/memMgt.d/memMgt.h"
 
-#define SIGMA 1e-10
+#define SIGMA 1e-11
 
 //== Structs 
 struct matrixType {
@@ -67,7 +67,7 @@ struct matrixType *invert(struct matrixType *A) {
     }
 
     //Check for very small elemts in the matrix. 
-    showMatrix(M, "1. Augmented Matrix");
+    //showMatrix(M, "1. Augmented Matrix");
 
     //================ Gauss
     // Gauss: Go down the diagonal: Create lower echelon form
@@ -106,14 +106,14 @@ struct matrixType *invert(struct matrixType *A) {
         for(int r = (diag + 1); r < M->Nrows; r++) {
             dtemp = M->matrix[r][diag];
             for(int c = diag; c < M->Ncols; c++) {
+                // I don't need to do this, if M->matrix[r][c] == 0
                 M->matrix[r][c] = M->matrix[r][c] - (dtemp * M->matrix[diag][c]);
                 if (fabs(M->matrix[r][c]) <= SIGMA) {
                     M->matrix[r][c] = 0.0;
                 }
             }
-
         }
-        showMatrix(M, "3. Gauss Matrix:");            
+        //showMatrix(M, "3. Gauss Matrix:");            
     }
     
     //================ Jordan
@@ -130,7 +130,7 @@ struct matrixType *invert(struct matrixType *A) {
                 }
             }
         }
-        showMatrix(M, "4. Jordan Matrix:");            
+        //showMatrix(M, "4. Jordan Matrix:");            
     }
 
     // Finally, we need to reorganize the M matrix so that it only holds the inverse matrix.
@@ -161,6 +161,9 @@ int main() {
     B = invert(A);
     showMatrix(B, "Matrix A: Inverse matrix");
 
+    C = multiMatrix(B, A);
+    showMatrix(C, "This should be the identity matrix.");
+    
     /*
       A = newMatrix(2,2);
       initMatrix(A, (double []){1.0, 2.0, 3.0, 4.0}, 4);
